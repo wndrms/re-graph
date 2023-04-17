@@ -26,7 +26,7 @@ const SearchBar = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{'display': 'flex', 'flexDirection':'column'}}>
             <label>
                 시작 날짜:
                 <input type="date" name="startDate" value={startDate} onChange={(e) => setStartDate(e.target.value)}/>
