@@ -11,9 +11,7 @@ const Main = () => {
 				await setaddresslist(driver);
 			} catch (error) {
 				console.error(`Something went wrong1: ${error}`);
-			} finally {
-				await session.close();
-			}
+			} 
 			async function setaddresslist(driver) {
 				const session = driver.session({ database: 'neo4j' });
 				try {

@@ -13,9 +13,7 @@ const Graph = () => {
         await findNodes(driver, target)
       } catch (error) {
         console.error(`Something went wrong1: ${error}`);
-      } finally {
-        await session.close();
-      }
+      } 
 
       async function findNodes(driver, target) {
         const session = driver.session({ database: 'neo4j' });
