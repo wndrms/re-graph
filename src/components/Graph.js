@@ -14,7 +14,7 @@ const Graph = () => {
       } catch (error) {
         console.error(`Something went wrong1: ${error}`);
       } finally {
-        await driver.close();
+        await session.close();
       }
 
       async function findNodes(driver, target) {
