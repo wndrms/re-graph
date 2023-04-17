@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import driver from './neo4j'
-import Generate_G from "./Generate_G";
+import DrawGraph from "./DrawGraph";
 
 const Graph = () => {
   const [data, setData] = useState({ nodes: [], links: [] });
@@ -89,7 +89,7 @@ const Graph = () => {
         return neighbors
       }
     })();
-  }, []);
+  }, [target]);
 
   const handleClick = (node) => {
     setSelected(node);
@@ -100,13 +100,13 @@ const Graph = () => {
       <header className="App-header">
         <div style={{'display':'flex'}}>
           <div style={{'width': '50%'}}>
-            <Generate_G data={data} onClick={handleClick}/>
+            <DrawGraph data={data} onClick={handleClick}/>
           </div>
           <div style={{'width': '50%'}}>
             {selected && 
               <>
                 <h2>{selected.name}</h2>
-                <a href={"https://etherscan.io/address/" + selected.name} target="_blank">Etherscan</a>
+                <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
                 <p>{selected.type}</p>
                 <p>Balance : {}</p>
               </>

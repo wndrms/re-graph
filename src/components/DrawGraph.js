@@ -18,10 +18,10 @@ echarts.use([
 ]);
 
 
-const Generate_G = ({ data, onClick }) => {
-    function handleClick(node) {
-        onClick(node);
-    }
+const DrawGraph = ({ data, onClick }) => {
+  function handleClick(node) {
+      onClick(node);
+  }
   const chartRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -95,7 +95,6 @@ const Generate_G = ({ data, onClick }) => {
         if (params.componentType === 'series') {
           if (params.dataType === 'node') {
             const nodeIndex = params.dataIndex;
-            console.log(data.nodes[nodeIndex])
             handleClick(data.nodes[nodeIndex]);
           }
           
@@ -107,4 +106,4 @@ const Generate_G = ({ data, onClick }) => {
   return <div ref={chartRef} style={{ height: '1000px' }} />;
 };
 
-export default Generate_G;
+export default DrawGraph;
