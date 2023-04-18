@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import driver from './neo4j'
 import DrawGraph from "./DrawGraph";
+import axios from "axios";
 
 const Graph = () => {
   const [data, setData] = useState({ nodes: [], links: [] });
   const [selected, setSelected] = useState(null);
+  const [balance, setBalance] = useState();
   const target = useParams().id;
   useEffect(() => {
     (async () => {
@@ -89,7 +91,11 @@ const Graph = () => {
     })();
   }, [target]);
 
-  const handleClick = (node) => {
+  const handleClick = async (node) => {
+    const addr = node.name;
+    console.log(addr);
+    const response = await axios.post('http://localhost:5000/execute', { addr });
+    setBalance(response.data.result);
     setSelected(node);
   }
 
@@ -106,7 +112,7 @@ const Graph = () => {
                 <h2>{selected.name}</h2>
                 <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
                 <p>{selected.type}</p>
-                <p>Balance : {}</p>
+                <p>Balance : {balance}</p>
               </>
             }
           </div>

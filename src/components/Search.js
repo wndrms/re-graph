@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 
 const SearchBar = () => {
     const [query, setQuery] = useState('');
@@ -8,8 +9,20 @@ const SearchBar = () => {
     const [endDate, setEndDate] = useState();
     const [endTime, setEndTime] = useState();
 
+    const instance = axios.create({
+        baseURL: 'http://localhost:8000/api/',
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': 'csrftoken'
+        }
+    });
+
     function handleSubmit(event) {
         event.preventDefault();
+        instance.get('hello')
+            .then(response => console.log(response.data))
+            .catch(error => console.error(error));
         const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
         if (!ethereumAddressRegex.test(query)) {
             seterror(true);
