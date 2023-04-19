@@ -145,8 +145,12 @@ const Graph = () => {
             </div>
             <div style={{'height':'50%'}}>
               test
-              <DrawBarGraph title="Income" data={income}/>
-              <DrawBarGraph title="Outgoing" data={outgoing}/>
+              {income && 
+                <>
+                  <DrawBarGraph title="Income" data={income}/>
+                  <DrawBarGraph title="Outgoing" data={outgoing}/>
+                </>
+              }
             </div>
           </div>
         </div>
