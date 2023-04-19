@@ -3,11 +3,14 @@ import { useParams } from 'react-router-dom';
 import driver from './neo4j'
 import DrawGraph from "./DrawGraph";
 import axios from "axios";
+import DrawBarGraph from "./DrawBarGraph";
 
 const Graph = () => {
   const [data, setData] = useState({ nodes: [], links: [] });
   const [selected, setSelected] = useState(null);
   const [balance, setBalance] = useState();
+  const [income, setIncome] = useState();
+  const [outgoing, setOutgoing] = useState();
   const target = useParams().id;
   useEffect(() => {
     (async () => {
@@ -93,10 +96,33 @@ const Graph = () => {
 
   const handleClick = async (node) => {
     const addr = node.name;
-    console.log(addr);
-    const response = await axios.post('http://localhost:5000/execute', { addr });
+    const response = await axios.post('/execute', { addr });
     setBalance(response.data.result);
     setSelected(node);
+    var inc = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
+    var out = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
+    data.links.forEach((link) => {
+      if(link.source === addr){
+        var t = data.nodes.find((node) => node.name === link.target).type;
+        if (t === undefined){
+          out.Etc += link.value;
+        } else {
+          out[t] += link.value;
+        }
+      } else if (link.target === addr) {
+        var t = data.nodes.find((node) => node.name === link.source).type;
+        if (t === undefined){
+          inc.Etc += link.value;
+        } else {
+          inc[t] += link.value;
+        }
+      }
+    })
+    setIncome(inc);
+    setOutgoing(out);
+    console.log(inc);
+    console.log(out);
+
   }
 
   return (
@@ -106,15 +132,22 @@ const Graph = () => {
           <div style={{'width': '50%'}}>
             <DrawGraph data={data} onClick={handleClick}/>
           </div>
-          <div style={{'width': '50%'}}>
-            {selected && 
-              <>
-                <h2>{selected.name}</h2>
-                <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
-                <p>{selected.type}</p>
-                <p>Balance : {balance}</p>
-              </>
-            }
+          <div style={{'display':'flex', 'flexDirection':'column', 'width': '50%'}}>
+            <div style={{'height':'50%'}}>
+              {selected && 
+                <>
+                  <h2>{selected.name}</h2>
+                  <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
+                  <p>{selected.type}</p>
+                  <p>Balance : {balance}</p>
+                </>
+              }
+            </div>
+            <div style={{'height':'50%'}}>
+              test
+              <DrawBarGraph title="Income" data={income}/>
+              <DrawBarGraph title="Outgoing" data={outgoing}/>
+            </div>
           </div>
         </div>
         
