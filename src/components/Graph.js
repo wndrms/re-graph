@@ -110,7 +110,7 @@ const Graph = () => {
           out[t] += link.value;
         }
       } else if (link.target === addr) {
-        var t = data.nodes.find((node) => node.name === link.source).type;
+        t = data.nodes.find((node) => node.name === link.source).type;
         if (t === undefined){
           inc.Etc += link.value;
         } else {
