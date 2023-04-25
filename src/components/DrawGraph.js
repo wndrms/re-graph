@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts/core';
 import { GraphChart } from 'echarts/charts';
 import {
@@ -19,12 +19,8 @@ echarts.use([
 
 
 const DrawGraph = ({ data, onClick }) => {
-  function handleClick(node) {
-      onClick(node);
-  }
-  const chartRef = React.useRef(null);
-
-  React.useEffect(() => {
+  const chartRef = useRef(null);
+  useEffect(() => {
     
     const layerGroups = new Map();
     data.nodes.forEach(node => {
@@ -91,17 +87,18 @@ const DrawGraph = ({ data, onClick }) => {
         ],
       };
       chart.setOption(options);
+      chart.off('click');
       chart.on('click', (params) => {
         if (params.componentType === 'series') {
           if (params.dataType === 'node') {
             const nodeIndex = params.dataIndex;
-            handleClick(data.nodes[nodeIndex]);
+            onClick(data.nodes[nodeIndex]);
           }
           
         }
       });
     }
-  }, [data]);
+  }, [data, onClick]);
 
   return <div ref={chartRef} style={{ height: '1000px' }} />;
 };

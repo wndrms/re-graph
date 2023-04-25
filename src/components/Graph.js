@@ -11,6 +11,7 @@ const Graph = () => {
   const [balance, setBalance] = useState();
   const [income, setIncome] = useState();
   const [outgoing, setOutgoing] = useState();
+  const [txlist, setTxlist] = useState();
   const target = useParams().id;
   useEffect(() => {
     (async () => {
@@ -95,34 +96,35 @@ const Graph = () => {
   }, [target]);
 
   const handleClick = async (node) => {
-    const addr = node.name;
-    const response = await axios.post('/execute', { addr });
-    setBalance(response.data.result);
-    setSelected(node);
-    var inc = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
-    var out = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
-    data.links.forEach((link) => {
-      if(link.source === addr){
-        var t = data.nodes.find((node) => node.name === link.target).type;
-        if (t === undefined){
-          out.Etc += link.value;
-        } else {
-          out[t] += link.value;
+    if(node.name !== undefined){
+      const addr = node.name;
+      const response = await axios.post('/execute', { addr });
+      setBalance(response.data.result);
+      setSelected(node);
+      var inc = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
+      var out = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
+      data.links.forEach((link) => {
+        if(link.source === addr){
+          var t = data.nodes.find((node) => node.name === link.target).type;
+          if (t === undefined){
+            out.Etc += link.value;
+          } else {
+            out[t] += link.value;
+          }
+        } else if (link.target === addr) {
+          t = data.nodes.find((node) => node.name === link.source).type;
+          if (t === undefined){
+            inc.Etc += link.value;
+          } else {
+            inc[t] += link.value;
+          }
         }
-      } else if (link.target === addr) {
-        t = data.nodes.find((node) => node.name === link.source).type;
-        if (t === undefined){
-          inc.Etc += link.value;
-        } else {
-          inc[t] += link.value;
-        }
-      }
-    })
-    setIncome(inc);
-    setOutgoing(out);
-    console.log(inc);
-    console.log(out);
-
+      })
+      setIncome(inc);
+      setOutgoing(out);
+      //const response2 = await axios.post('/loadtx', { addr });
+      //setTxlist(response2.data.result);
+    }
   }
 
   return (
@@ -150,6 +152,15 @@ const Graph = () => {
                   <DrawBarGraph title="Income" data={income}/>
                   <DrawBarGraph title="Outgoing" data={outgoing}/>
                 </>
+              }
+              {txlist && 
+                  txlist.map( tx => {
+                    return(
+                      <div>
+                        <p>{tx.BlockNumber}</p>
+                      </div>
+                    )
+                  })
               }
             </div>
           </div>
