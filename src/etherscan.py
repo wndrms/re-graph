@@ -5,13 +5,13 @@ import logging
 from neo4j.exceptions import ServiceUnavailable
 
 API_KEY = "5167S634GJGKUS2AQDSCCV1FYXKVYR6XPQ"
-Target_ADDR = "0x1819ede3b8411ebc613f3603813bf42ae09ba5a5"
-START_BLOCK = 17017069
-END_BLOCK = 17066996
+Target_ADDR = "0x7373dca267bdc623dfba228696c9d4e8234469f6"
+START_BLOCK = 16247159
+END_BLOCK = 16247463
 url = "https://api.etherscan.io/api?module=account&action=txlist&address={}&startblock={}&endblock={}&page={}&offset=100&sort=dec&apikey={}"
-account_list = ['0x1819ede3b8411ebc613f3603813bf42ae09ba5a5']
+account_list = [Target_ADDR]
 done = []
-Contracts = ['0x6cc8dcbca746a6e4fdefb98e1d0df903b107fd21', '0xd90e2f925da726b50c4ed8d0fb90ad053324f31b']
+Contracts = ['0xd90e2f925da726b50c4ed8d0fb90ad053324f31b']
 NEO4J_URI='neo4j+s://33d55752.databases.neo4j.io'
 NEO4J_USERNAME='neo4j'
 NEO4J_PASSWORD='fVru5CM_E3XdkqsS_zmC0JgN3vYtxc7Zu_ZGb6yp_yE'
@@ -29,8 +29,9 @@ class App:
     def create_tx(self, address1, address2, blocknum, timestamp, value, hash_num):
         with self.driver.session(database="neo4j") as session:
             try:
+                #print("Creating tx between: {addr1}, {addr2}".format(addr1=address1, addr2=address2))
                 result = session.execute_write(self._create_and_return_tx, address1, address2, blocknum, timestamp, value, hash_num)
-
+                
                 for row in result:
                     print("Created tx between: {addr1}, {addr2}".format(addr1=row['addr1'], addr2=row['addr2']))
             except Exception as e:

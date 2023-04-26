@@ -4,6 +4,7 @@ import driver from './neo4j'
 import DrawGraph from "./DrawGraph";
 import axios from "axios";
 import DrawBarGraph from "./DrawBarGraph";
+import './Graph.css';
 
 const Graph = () => {
   const [data, setData] = useState({ nodes: [], links: [] });
@@ -128,31 +129,55 @@ const Graph = () => {
   }
 
   return (
-    <div className="App">
       <header className="App-header">
         <div style={{'display':'flex'}}>
-          <div style={{'width': '50%'}}>
+          <div className="GraphGrid">
             <DrawGraph data={data} onClick={handleClick}/>
           </div>
-          <div style={{'display':'flex', 'flexDirection':'column', 'width': '50%'}}>
-            <div style={{'height':'50%'}}>
-              {selected && 
-                <>
-                  <h2>{selected.name}</h2>
-                  <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
-                  <p>{selected.type}</p>
-                  <p>Balance : {balance}</p>
-                </>
-              }
+          <div className="InfoGrid">
+            <div className="Outline">
+              <div className="InfoHeader">
+                <div>
+                  <h3>INFO</h3>
+                </div>
+                <div>
+                  <h3>ANALYSIS</h3>
+                </div>
+                <div>
+                  <h3>PATTERN</h3>
+                </div>
+              </div>
+              <div className="InfoContent">
+                {selected && 
+                  <>
+                    <h2>{selected.name}</h2>
+                    <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
+                    <p>{selected.type}</p>
+                    <p>Balance : {balance}</p>
+                  </>
+                }
+              </div>
             </div>
             <div style={{'height':'50%'}}>
-              test
-              {income && 
-                <>
-                  <DrawBarGraph title="Income" data={income}/>
-                  <DrawBarGraph title="Outgoing" data={outgoing}/>
-                </>
-              }
+              <div className="InfoHeader">
+                <div>
+                  <h3>SOURCE OF ACCOUNT</h3>
+                </div>
+                <div>
+                  <h3>TRANSACTION LIST</h3>
+                </div>
+                <div>
+                  <h3></h3>
+                </div>
+              </div>
+              <div className="InfoContent">
+                {income && 
+                  <>
+                    <DrawBarGraph title="Income" data={income}/>
+                    <DrawBarGraph title="Outgoing" data={outgoing}/>
+                  </>
+                }
+              </div>
               {txlist && 
                   txlist.map( tx => {
                     return(
@@ -167,7 +192,6 @@ const Graph = () => {
         </div>
         
       </header>
-    </div>
   );
 }
 

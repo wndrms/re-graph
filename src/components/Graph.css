@@ -1,0 +1,50 @@
+@font-face {
+    font-family: 'NanumSquareB';
+    src: url(https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css) format("css");
+}
+* {
+    font-family: NanumSquareB !important;
+}
+div.App {
+    padding: 30px;
+    background-color: #fff;
+}
+
+div.GraphGrid {
+    width: 60%;
+    height: 100%;
+    margin: 0, 15px, 0, 0;
+    border-radius: 10px;
+    border: solid 1px #cfd3e4;
+    background-color: #fff;
+}
+
+div.InfoGrid {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+}
+
+.InfoGrid > div {
+    width: 100%;
+    height: 50%;
+    border-radius: 10px;
+    border: solid 1px #cfd3e4;
+    background-color: #fff;
+}
+.InfoHeader {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-direction: row;
+}
+.InfoHeader > div {
+    width: 33%;
+    height: 100%;
+    text-align: center;
+    line-height: 100%;
+}
+
+.InfoContent {
+    padding: 60px;
+}
