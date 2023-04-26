@@ -100,7 +100,7 @@ const Graph = () => {
     if(node.name !== undefined){
       const addr = node.name;
       const response = await axios.post('/execute', { addr });
-      setBalance(response.data.result);
+      setBalance(response.data.result.toFixed(2));
       setSelected(node);
       var inc = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
       var out = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
@@ -150,10 +150,19 @@ const Graph = () => {
               <div className="InfoContent">
                 {selected && 
                   <>
-                    <h2>{selected.name}</h2>
-                    <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>
-                    <p>{selected.type}</p>
-                    <p>Balance : {balance}</p>
+                    <div className="AddressArea">
+                      <p className="address">{selected.name}</p>
+                      <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>  
+                    </div>
+                    <div>
+                      <div>
+                        <p>{selected.type}</p>
+                      </div>
+                      <div>
+                        <p className="BalanceTitle">현재 잔고</p> 
+                        <p className="BalanceValue">{balance}ETH</p>
+                      </div>
+                    </div>
                   </>
                 }
               </div>

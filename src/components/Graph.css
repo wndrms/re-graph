@@ -1,7 +1,8 @@
 @font-face {
     font-family: 'NanumSquareB';
-    src: url(https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css) format("css");
+    src: url(./../asset/font/NanumSquareB.woff2) format('woff2');
 }
+
 * {
     font-family: NanumSquareB !important;
 }
@@ -47,4 +48,25 @@ div.InfoGrid {
 
 .InfoContent {
     padding: 60px;
+}
+
+.AddressArea {
+    display: flex;
+    flex-direction: row;
+}
+p.address {
+    font-size: 18px;
+    font-weight: normal;
+    color: #1f1f1f;
+}
+
+.BalanceTitle {
+    font-size: 14px;
+    color: #1f1f1f;
+}
+
+.BalanceValue {
+    font-size: 28px;
+    color: #8f8084;
+    margin: 0;
 }
