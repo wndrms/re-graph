@@ -12,6 +12,7 @@ const Graph = () => {
   const [balance, setBalance] = useState();
   const [income, setIncome] = useState();
   const [outgoing, setOutgoing] = useState();
+  const [menu, setMenu] = useState();
   const [txlist, setTxlist] = useState();
   const target = useParams().id;
   useEffect(() => {
@@ -123,6 +124,7 @@ const Graph = () => {
       })
       setIncome(inc);
       setOutgoing(out);
+      setMenu(1);
       //const response2 = await axios.post('/loadtx', { addr });
       //setTxlist(response2.data.result);
     }
@@ -137,7 +139,7 @@ const Graph = () => {
           <div className="InfoGrid">
             <div className="Outline">
               <div className="InfoHeader">
-                <div>
+                <div className="selected">
                   <h3>INFO</h3>
                 </div>
                 <div>
@@ -154,8 +156,8 @@ const Graph = () => {
                       <p className="address">{selected.name}</p>
                       <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>  
                     </div>
-                    <div>
-                      <div>
+                    <div className="InfoBox">
+                      <div className="TypeBox">
                         <p>{selected.type}</p>
                       </div>
                       <div>
@@ -169,25 +171,25 @@ const Graph = () => {
             </div>
             <div style={{'height':'50%'}}>
               <div className="InfoHeader">
-                <div>
-                  <h3>SOURCE OF ACCOUNT</h3>
+                <div className={menu === 1 ? "selected" : ""}>
+                  <h3 onClick={() => setMenu(1)}>SOURCE OF ACCOUNT</h3>
                 </div>
-                <div>
-                  <h3>TRANSACTION LIST</h3>
+                <div className={menu === 2 ? "selected" : ""}>
+                  <h3 onClick={() => setMenu(2)}>TRANSACTION LIST</h3>
                 </div>
-                <div>
+                <div className={menu === 3 ? "selected" : ""}>
                   <h3></h3>
                 </div>
               </div>
               <div className="InfoContent">
-                {income && 
+                {(menu === 1 && income) && 
                   <>
                     <DrawBarGraph title="Income" data={income}/>
                     <DrawBarGraph title="Outgoing" data={outgoing}/>
                   </>
                 }
               </div>
-              {txlist && 
+              {(menu === 2 && txlist) && 
                   txlist.map( tx => {
                     return(
                       <div>

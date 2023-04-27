@@ -45,6 +45,9 @@ div.InfoGrid {
     text-align: center;
     line-height: 100%;
 }
+.InfoHeader > div.selected {
+    border-bottom: solid 5px #254d71;
+}
 
 .InfoContent {
     padding: 60px;
@@ -60,8 +63,32 @@ p.address {
     color: #1f1f1f;
 }
 
+.InfoBox {
+    width: 34%;
+    height: 120%;
+    padding: 16px 0 0 16px;
+    border-radius: 2px;
+    background-color: #e3f5f8;
+}
+
+.TypeBox {
+    width: 40%;
+    height: 33px;
+    border-radius: 20px;
+    background-color: #21a3b4;
+}
+
+.TypeBox > p {
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+    line-height: 33px;
+    color: #fff;
+}
+
 .BalanceTitle {
     font-size: 14px;
+    margin: 15px 0 2px 0;
     color: #1f1f1f;
 }
 
