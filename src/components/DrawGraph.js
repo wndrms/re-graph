@@ -46,7 +46,7 @@ const DrawGraph = ({ data, onClick }) => {
         title: {
           text: 'Money Laundering',
         },
-        tooltip: {
+        /*tooltip: {
           trigger: 'item',
           formatter: function (params) {
             if (params.dataType === 'edge') {
@@ -55,7 +55,7 @@ const DrawGraph = ({ data, onClick }) => {
                 return `Node: ${params.name}`;
             }
           }
-        },
+        },*/
         legend: {
           show: true,
         },

@@ -57,6 +57,10 @@ div.InfoGrid {
     display: flex;
     flex-direction: row;
 }
+.AddressArea > a > img {
+    width: 30px;
+    height: 30px;
+}
 p.address {
     font-size: 18px;
     font-weight: normal;
