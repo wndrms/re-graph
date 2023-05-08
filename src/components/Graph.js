@@ -25,7 +25,7 @@ const Graph = () => {
 
       async function findNodes(driver, target) {
         const session = driver.session({ database: 'neo4j' });
-        var nodes = [{name: target, layer: 0}]
+        var nodes = [{name: target, layer: 0, type: 'Hacker'}]
         var links = []
         try {
           const readQuery = 'MATCH (a:Wallet)-[t:TX]->(b:Wallet) WHERE a.hacker=$name OR b.hacker=$name RETURN a, t, b';
@@ -56,6 +56,26 @@ const Graph = () => {
             node.layer = last_layer - 2;
           else if (node.type === 'Exchange')
             node.layer = last_layer - 1;
+          switch (node.layer) {
+            case 0 :
+              node.itemStyle = {color: '#fd683b'}
+              break
+            case 1 :
+              node.itemStyle = {color: '#D27652'}
+              break
+            case 2 :
+              node.itemStyle = {color: '#938776'}
+              break
+            case 3 :
+              node.itemStyle = {color: '#4E989C'}
+              break
+            case 4 :
+              node.itemStyle = {color: '#22a3b4'}
+              break
+            default :
+              node.itemStyle = {color: '#FFFFFF'}
+              return
+          }
         });
         links.forEach((link) => {
           if (link.target === target)
@@ -154,7 +174,9 @@ const Graph = () => {
                   <>
                     <div className="AddressArea">
                       <p className="address">{selected.name}</p>
-                      <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">Etherscan</a>  
+                      <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">
+                        <img src="/img/etherscan-logo-circle.png" alt="Etherscan Logo"/>
+                      </a>
                     </div>
                     <div className="InfoBox">
                       <div className="TypeBox">

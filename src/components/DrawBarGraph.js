@@ -22,7 +22,7 @@ const DrawBarGraph = ({title, data}) => {
     if (chartRef.current) {
         const chart = echarts.init(chartRef.current);
         const total = Object.values(data).reduce((acc, value) => acc + value, 0);
-        const gdata = Object.entries(data).map(([key, value]) => ({name: key, data: [value/total*100]}));
+        const gdata = Object.entries(data).map(([key, value]) => ({name: key, data: [(value/total*100).toFixed(1)]}));
         const option = {
             title: {
                 text: title,
