@@ -5,13 +5,13 @@ import logging
 from neo4j.exceptions import ServiceUnavailable
 
 API_KEY = "5167S634GJGKUS2AQDSCCV1FYXKVYR6XPQ"
-Target_ADDR = "0x7373dca267bdc623dfba228696c9d4e8234469f6"
-START_BLOCK = 16247159
-END_BLOCK = 16247463
-url = "https://api.etherscan.io/api?module=account&action=txlist&address={}&startblock={}&endblock={}&page={}&offset=100&sort=dec&apikey={}"
+Target_ADDR = "0x0e57edba0fccb1e388926193c873120cab961fee"
+START_BLOCK = 8139592
+END_BLOCK = 99999999
+url = "https://api.etherscan.io/api?module=account&action=txlist&address={}&startblock={}&endblock={}&page={}&offset=1000&sort=dec&apikey={}"
 account_list = [Target_ADDR]
 done = []
-Contracts = ['0xd90e2f925da726b50c4ed8d0fb90ad053324f31b']
+Contracts = ['0xd90e2f925da726b50c4ed8d0fb90ad053324f31b', '0xf859a1ad94bcf445a406b892ef0d3082f4174088', '0x398ec7346dcd622edc5ae82352f02be94c62d119']
 NEO4J_URI='neo4j+s://33d55752.databases.neo4j.io'
 NEO4J_USERNAME='neo4j'
 NEO4J_PASSWORD='fVru5CM_E3XdkqsS_zmC0JgN3vYtxc7Zu_ZGb6yp_yE'
@@ -40,25 +40,50 @@ class App:
     @staticmethod
     def _create_and_return_tx(tx, address1, address2, blocknum, timestamp, value, hash_num):
         query = (
-            "MERGE (addr1:Wallet { addr: $address1 }) "
-            "ON CREATE SET addr1.hacker = $target "
-            "MERGE (addr2:Wallet { addr: $address2 }) "
-            "ON CREATE SET addr2.hacker = $target "
+            "MERGE (addr1:EA { Address: $address1 }) "
+            "ON CREATE SET addr1.Hacking_Case = $target, addr1.Account_Type = 'Wallet', addr1.Label = 'Dodgy' "
+            "MERGE (addr2:EA { Address: $address2 }) "
+            "ON CREATE SET addr2.Hacking_Case = $target, addr1.Account_Type = 'Wallet', addr1.Label = 'Dodgy' "
             "MERGE (addr1)-[:TX {hash: $hash, blocknum: $blocknum, timestamp: $timestamp, value: $value}]->(addr2) "
             "RETURN addr1, addr2"
         )
         result = tx.run(query, address1=address1, address2=address2, hash=hash_num, blocknum=blocknum, timestamp=timestamp, value=value, target=Target_ADDR)
         try:
-            return [{"addr1": row["addr1"]["addr"], "addr2": row["addr2"]["addr"]}
+            return [{"addr1": row["addr1"]["Address"], "addr2": row["addr2"]["Address"]}
                     for row in result]
         except ServiceUnavailable as exception:
             logging.error("{query} raised an error: \n {exception}".format(
                 query=query, exception=exception
             ))
             raise
+    
+    def get_account_type(self, address):
+        with self.driver.session(database="neo4j") as session:
+            try:
+                result = session.execute_read(self._get_account_type, address)
+                if len(result) != 0:
+                    return result[0]
+                else:
+                    return 'No Data'
+            except Exception as e:
+                print(e)
+    @staticmethod
+    def _get_account_type(tx, address):
+        query = (
+            "match (n:EA) where n.Address = $address return n.Account_Type"
+        )
+        result = tx.run(query, address=address)
+        try:
+            return [row['n.Account_Type'] for row in result]
+        except ServiceUnavailable as exception:
+            logging.error("{query} raised an error: \n {exception}".format(
+                query=query, exception=exception
+            ))
+            raise
+        
 
 def crawl_tx(account, start, end, app):
-    for page in range(1, 100):
+    for page in range(1, 10):
         r = requests.get(url.format(account, start, end, page, API_KEY))
         json = r.json()
         result = json['result']
@@ -73,8 +98,9 @@ def crawl_tx(account, start, end, app):
             }
             if data['value']>=0.5:
                 app.create_tx(data['from'], data['to'], data['BlockNumber'], data['Timestamp'], data['value'], data['hash'])
-                if data['to'] not in done and data['to'] not in Contracts and data['to'] not in account_list:
-                    account_list.append(data['to'])
+                if data['to'] not in done and data['to'] not in account_list:
+                    if app.get_account_type(data['to']) not in ['Smart Contract', 'Exchange'] :
+                        account_list.append(data['to'])
     done.append(data['to'])
 
 if __name__ == '__main__':

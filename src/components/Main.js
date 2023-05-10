@@ -15,14 +15,14 @@ const Main = () => {
 			async function setaddresslist(driver) {
 				const session = driver.session({ database: 'neo4j' });
 				try {
-					const readQuery = 'Match (w:Wallet) RETURN DISTINCT w.hacker, w.hackinfo';
+					const readQuery = 'MATCH (w1:EA)-[]->(w2:EA) WHERE w1.Hacking_Case is null and w2.Hacking_Case is not null return DISTINCT w1.Name, w2.Hacking_Case';
 					const readResult = await session.executeRead(tx =>
 						tx.run(readQuery)
 					);
 					const adlist = [];
 					readResult.records.forEach(record => {
-						if (record.get('w.hacker') !== null && record.get('w.hackinfo') !== null)
-							adlist.push({address: record.get('w.hacker'), info: record.get('w.hackinfo')});
+						if (record.get('w1.Name') !== null && record.get('w2.Hacking_Case') !== null)
+							adlist.push({address: record.get('w2.Hacking_Case'), info: record.get('w1.Name')});
 					})
 					setaddrlist(adlist);
 				} catch (error) {

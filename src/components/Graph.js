@@ -28,19 +28,19 @@ const Graph = () => {
         var nodes = [{name: target, layer: 0, type: 'Hacker'}]
         var links = []
         try {
-          const readQuery = 'MATCH (a:Wallet)-[t:TX]->(b:Wallet) WHERE a.hacker=$name OR b.hacker=$name RETURN a, t, b';
+          const readQuery = 'MATCH (a:EA)-[t:TX]->(b:EA) WHERE a.Hacking_Case=$name OR b.Hacking_Case=$name RETURN a, t, b';
           const readResult = await session.executeRead(tx =>
             tx.run(readQuery, { name: target })
           );
           
           readResult.records.forEach(record => {
-            if (nodes.find((node) => node.name === record.get('a').properties.addr) === undefined)
-              nodes.push({ name: record.get('a').properties.addr, type: record.get('a').properties.type })
-            if (nodes.find((node) => node.name === record.get('b').properties.addr) === undefined)
-              nodes.push({ name: record.get('b').properties.addr, type: record.get('b').properties.type })
-            const link = links.find((link) => link.source === record.get('a').properties.addr && link.target === record.get('b').properties.addr) 
+            if (nodes.find((node) => node.name === record.get('a').properties.Address) === undefined)
+              nodes.push({ name: record.get('a').properties.Address, type: record.get('a').properties.Account_Type })
+            if (nodes.find((node) => node.name === record.get('b').properties.Address) === undefined)
+              nodes.push({ name: record.get('b').properties.Address, type: record.get('b').properties.Account_Type })
+            const link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address) 
             if ( link === undefined ){
-              links.push({ source: record.get('a').properties.addr, target: record.get('b').properties.addr, value: record.get('t').properties.value});
+              links.push({ source: record.get('a').properties.Address, target: record.get('b').properties.Address, value: record.get('t').properties.value});
             } else {
               link.value += record.get('t').properties.value
             }
@@ -52,7 +52,7 @@ const Graph = () => {
         }
         var last_layer = setLayer(nodes, links, target);
         nodes.forEach((node) => {
-          if (node.type === 'Contract') 
+          if (node.type === 'Smart Contract') 
             node.layer = last_layer - 2;
           else if (node.type === 'Exchange')
             node.layer = last_layer - 1;
