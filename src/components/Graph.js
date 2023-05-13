@@ -73,7 +73,7 @@ const Graph = () => {
               node.itemStyle = {color: '#22a3b4'}
               break
             default :
-              node.itemStyle = {color: '#FFFFFF'}
+              node.itemStyle = {color: '#000000'}
               return
           }
         });
