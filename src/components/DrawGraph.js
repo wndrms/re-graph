@@ -80,7 +80,13 @@ const DrawGraph = ({ data, onClick }) => {
             edgeLabel: {
               show: true,
               position: 'insideMiddle',
-              formatter: '{@value}',
+              formatter: function (params) {
+                if (params.data.token_symbol === undefined) {
+                  return `${params.data.value}`
+                } else {
+                  return `${params.data.value} ${params.data.token_symbol}`
+                }
+              }
             },
             autoCurveness: 0.2,
           },

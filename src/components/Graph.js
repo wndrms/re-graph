@@ -88,7 +88,7 @@ const Graph = () => {
         });
         links.forEach((link) => {
           if (link.token_symbol !== undefined){
-            link.itemStyle = {color: '#' + colors[link.token_symbol]}
+            link.lineStyle = {color: '#' + colors[link.token_symbol]}
           }
           if (link.target === target)
             nodes.find((node) => node.name === link.source).layer = -1;
