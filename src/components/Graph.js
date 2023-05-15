@@ -96,7 +96,7 @@ const Graph = () => {
             nodes.find((node) => node.id === link.source).layer = -1;
         })
         setData({ nodes, links });
-        if(nodes.length <= 20) {
+        /*if(nodes.length <= 20) {
           var adjMatrix = Array.from({ length: nodes.length }, () => Array.from({ length: nodes.length }, () => 0));
           links.forEach((link) => {
             adjMatrix[nodes.findIndex((node) => node.id === link.source)][nodes.findIndex((node) => node.id === link.target)] += link.value;
@@ -106,7 +106,7 @@ const Graph = () => {
           console.log('Web Centralities:', centralityVector);
           console.log('Dominant Eigenvalue:', eigenvalue);
           console.log(nodes[centralityVector.indexOf(Math.max(...centralityVector))])
-        }
+        }*/
       }
 
       function calculateWebCentralities(adjacencyMatrix, epsilon) {
