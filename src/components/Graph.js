@@ -25,25 +25,25 @@ const Graph = () => {
 
       async function findNodes(driver, target) {
         const session = driver.session({ database: 'neo4j' });
-        var nodes = [{name: target, layer: 0, type: 'Hacker'}]
+        var nodes = []
         var links = []
         var colors = []
         try {
-          const readQuery = 'MATCH (a:EA)-[t:TX]->(b:EA) WHERE a.Hacking_Case=$name OR b.Hacking_Case=$name RETURN a, t, b';
+          const readQuery = 'MATCH (a:EA)-[t:TX]->(b:EA) WHERE a.Hacking_Case=$address OR b.Hacking_Case=$address RETURN a, t, b';
           const readResult = await session.executeRead(tx =>
-            tx.run(readQuery, { name: target })
+            tx.run(readQuery, { address: target })
           );
           
           readResult.records.forEach(record => {
-            if (nodes.find((node) => node.name === record.get('a').properties.Address) === undefined)
-              nodes.push({ name: record.get('a').properties.Address, type: record.get('a').properties.Account_Type })
-            if (nodes.find((node) => node.name === record.get('b').properties.Address) === undefined)
-              nodes.push({ name: record.get('b').properties.Address, type: record.get('b').properties.Account_Type })
+            if (nodes.find((node) => node.id === record.get('a').properties.Address) === undefined)
+              nodes.push({ id: record.get('a').properties.Address, name: record.get('a').properties.Name, type: record.get('a').properties.Account_Type })
+            if (nodes.find((node) => node.id === record.get('b').properties.Address) === undefined)
+              nodes.push({ id: record.get('b').properties.Address, name: record.get('b').properties.Name, type: record.get('b').properties.Account_Type })
             var link
             if (record.get('t').properties.tx_type === undefined){
               link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address)   
             } else {
-              link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address && link.tx_type == record.get('t').properties.tx_type && link.token_symbol == record.get('t').properties.token_symbol)   
+              link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address && link.tx_type === record.get('t').properties.tx_type && link.token_symbol === record.get('t').properties.token_symbol)   
             }
             if ( link === undefined ){
               links.push({ source: record.get('a').properties.Address, target: record.get('b').properties.Address, value: Math.round(record.get('t').properties.value), tx_type: record.get('t').properties.tx_type, token_symbol: record.get('t').properties.token_symbol});
@@ -61,8 +61,10 @@ const Graph = () => {
         }
         var last_layer = setLayer(nodes, links, target);
         nodes.forEach((node) => {
-          if (node.type === 'Smart Contract') 
+          if (node.type === 'Smart Contract'){
+            node.type = 'Contract';
             node.layer = last_layer - 2;
+          }
           else if (node.type === 'Exchange')
             node.layer = last_layer - 1;
           switch (node.layer) {
@@ -91,13 +93,14 @@ const Graph = () => {
             link.lineStyle = {color: '#' + colors[link.token_symbol]}
           }
           if (link.target === target)
-            nodes.find((node) => node.name === link.source).layer = -1;
+            nodes.find((node) => node.id === link.source).layer = -1;
         })
-        console.log(links);
+        console.log(nodes);
         setData({ nodes, links });
       }
       function setLayer(nodes, links, mainNode) {
         const queue = [mainNode];
+        nodes.find((node) => node.id === mainNode).layer = 0;
         const visited = {[mainNode]: true};
         let depth = 1;
         while(queue.length > 0) {
@@ -107,7 +110,7 @@ const Graph = () => {
             const neighbors = getNeighbors(currNode, links);
             for (const neighbor of neighbors) {
               if(!visited[neighbor]) {
-                const node = nodes.find((node) => node.name === neighbor);
+                const node = nodes.find((node) => node.id === neighbor);
                 node.layer = depth;
                 visited[neighbor] = true;
                 queue.push(neighbor);
@@ -131,8 +134,8 @@ const Graph = () => {
   }, [target]);
 
   const handleClick = async (node) => {
-    if(node.name !== undefined){
-      const addr = node.name;
+    if(node.id !== undefined){
+      const addr = node.id;
       const response = await axios.post('/execute', { addr });
       setBalance(response.data.result.toFixed(2));
       setSelected(node);
@@ -140,14 +143,14 @@ const Graph = () => {
       var out = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
       data.links.forEach((link) => {
         if(link.source === addr){
-          var t = data.nodes.find((node) => node.name === link.target).type;
+          var t = data.nodes.find((node) => node.id === link.target).type;
           if (t === undefined){
             out.Etc += link.value;
           } else {
             out[t] += link.value;
           }
         } else if (link.target === addr) {
-          t = data.nodes.find((node) => node.name === link.source).type;
+          t = data.nodes.find((node) => node.id === link.source).type;
           if (t === undefined){
             inc.Etc += link.value;
           } else {
@@ -186,11 +189,12 @@ const Graph = () => {
                 {selected && 
                   <>
                     <div className="AddressArea">
-                      <p className="address">{selected.name}</p>
-                      <a href={"https://etherscan.io/address/" + selected.name} target="_blank" rel="noreferrer">
+                      <p className="address">{selected.id}</p>
+                      <a href={"https://etherscan.io/address/" + selected.id} target="_blank" rel="noreferrer">
                         <img src="/img/etherscan-logo-circle.png" alt="Etherscan Logo"/>
                       </a>
                     </div>
+                    <p>{selected.name}</p>
                     <div className="InfoBox">
                       <div className="TypeBox">
                         <p>{selected.type}</p>

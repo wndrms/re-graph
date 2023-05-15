@@ -5,11 +5,12 @@ import logging
 from neo4j.exceptions import ServiceUnavailable
 
 API_KEY = "5167S634GJGKUS2AQDSCCV1FYXKVYR6XPQ"
-Target_ADDR = "0xE870b6be09f4566B70b51D6413e048b744A5F449".lower()
-START_BLOCK = 7831180
+Target_ADDR = "0x5bac20beef31d0eccb369a33514831ed8e9cdfe0".lower()
+START_BLOCK = 17036780
 END_BLOCK = 99999999
 url = "https://api.etherscan.io/api?module=account&action=txlist&address={}&startblock={}&endblock={}&page={}&offset=1000&sort=dec&apikey={}"
-account_list = [Target_ADDR]
+internal_url = "https://api.etherscan.io/api?module=account&action=txlistinternal&address={}&startblock={}&endblock={}&page={}&offset=1000&sort=asc&apikey={}"
+account_list = ['0x16af29b7efbf019ef30aae9023a5140c012374a5']
 done = []
 NEO4J_URI='neo4j+s://33d55752.databases.neo4j.io'
 NEO4J_USERNAME='neo4j'
@@ -104,6 +105,29 @@ def crawl_tx(account, start, end, app):
     account_list.remove(account)
     done.append(account)
 
+def crawl_internal_tx(account, start, end, app):
+    print(account)
+    for page in range(1, 10):
+        r = requests.get(internal_url.format(account, start, end, page, API_KEY))
+        json = r.json()
+        result = json['result']
+        for tx in result:
+            data = {
+                'BlockNumber' : tx['blockNumber'],
+                'Timestamp' : tx['timeStamp'],
+                'hash': tx['hash'],
+                'from': tx['from'],
+                'to': tx['to'],
+                'value': int(tx['value'])/pow(10,18)
+            }
+            if data['value']>=0.5:
+                app.create_tx(data['from'], data['to'], data['BlockNumber'], data['Timestamp'], data['value'], 'i'+data['hash'])
+                if data['to'] not in done and data['to'] not in account_list:
+                    if not check_addr(app, data['to']):
+                        account_list.append(data['to'])
+    account_list.remove(account)
+    done.append(account)
+
 def check_addr(app, address):
     account_type = app.get_account_type(address)
     if account_type == 'Smart Contract' or account_type == 'Exchange':
@@ -121,7 +145,7 @@ if __name__ == '__main__':
     while True:
         l = len(account_list)
         print(account_list)
-        crawl_tx(account_list[0], START_BLOCK, END_BLOCK, app)
+        crawl_internal_tx(account_list[0], START_BLOCK, END_BLOCK, app)
         if len(account_list) == 0:
             break
     app.close()
