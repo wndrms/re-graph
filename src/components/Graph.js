@@ -27,6 +27,7 @@ const Graph = () => {
         const session = driver.session({ database: 'neo4j' });
         var nodes = [{name: target, layer: 0, type: 'Hacker'}]
         var links = []
+        var colors = []
         try {
           const readQuery = 'MATCH (a:EA)-[t:TX]->(b:EA) WHERE a.Hacking_Case=$name OR b.Hacking_Case=$name RETURN a, t, b';
           const readResult = await session.executeRead(tx =>
@@ -38,9 +39,17 @@ const Graph = () => {
               nodes.push({ name: record.get('a').properties.Address, type: record.get('a').properties.Account_Type })
             if (nodes.find((node) => node.name === record.get('b').properties.Address) === undefined)
               nodes.push({ name: record.get('b').properties.Address, type: record.get('b').properties.Account_Type })
-            const link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address) 
+            var link
+            if (record.get('t').properties.tx_type === undefined){
+              link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address)   
+            } else {
+              link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address && link.tx_type == record.get('t').properties.tx_type && link.token_symbol == record.get('t').properties.token_symbol)   
+            }
             if ( link === undefined ){
-              links.push({ source: record.get('a').properties.Address, target: record.get('b').properties.Address, value: record.get('t').properties.value});
+              links.push({ source: record.get('a').properties.Address, target: record.get('b').properties.Address, value: record.get('t').properties.value, tx_type: record.get('t').properties.tx_type, token_symbol: record.get('t').properties.token_symbol});
+              if ( colors.find((token) => token === record.get('t').properties.token_symbol) === undefined){
+                colors[record.get('t').properties.token_symbol] = Math.floor(Math.random()*16777215).toString(16);
+              }
             } else {
               link.value += record.get('t').properties.value
             }
@@ -78,9 +87,13 @@ const Graph = () => {
           }
         });
         links.forEach((link) => {
+          if (link.token_symbol !== undefined){
+            link.itemStyle = {color: '#' + colors[link.token_symbol]}
+          }
           if (link.target === target)
             nodes.find((node) => node.name === link.source).layer = -1;
         })
+        console.log(links);
         setData({ nodes, links });
       }
       function setLayer(nodes, links, mainNode) {
