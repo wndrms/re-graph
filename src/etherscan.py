@@ -5,12 +5,12 @@ import logging
 from neo4j.exceptions import ServiceUnavailable
 
 API_KEY = "5167S634GJGKUS2AQDSCCV1FYXKVYR6XPQ"
-Target_ADDR = "0x5bac20beef31d0eccb369a33514831ed8e9cdfe0".lower()
-START_BLOCK = 17036780
+Target_ADDR = "0xe9aa3a74e3d62274f221eca42736cadc14ccffaf".lower()
+START_BLOCK = 5260193
 END_BLOCK = 99999999
 url = "https://api.etherscan.io/api?module=account&action=txlist&address={}&startblock={}&endblock={}&page={}&offset=1000&sort=dec&apikey={}"
 internal_url = "https://api.etherscan.io/api?module=account&action=txlistinternal&address={}&startblock={}&endblock={}&page={}&offset=1000&sort=asc&apikey={}"
-account_list = ['0x16af29b7efbf019ef30aae9023a5140c012374a5']
+account_list = ['0x078711c5dd7e6bbb3de12097d74931f941c4dd16']
 done = []
 NEO4J_URI='neo4j+s://33d55752.databases.neo4j.io'
 NEO4J_USERNAME='neo4j'
@@ -145,7 +145,7 @@ if __name__ == '__main__':
     while True:
         l = len(account_list)
         print(account_list)
-        crawl_internal_tx(account_list[0], START_BLOCK, END_BLOCK, app)
+        crawl_tx(account_list[0], START_BLOCK, END_BLOCK, app)
         if len(account_list) == 0:
             break
     app.close()

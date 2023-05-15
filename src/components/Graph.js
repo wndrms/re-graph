@@ -38,7 +38,7 @@ const Graph = () => {
             if (nodes.find((node) => node.id === record.get('a').properties.Address) === undefined)
               nodes.push({ id: record.get('a').properties.Address, name: record.get('a').properties.Name, type: record.get('a').properties.Account_Type, label: record.get('a').properties.Label })
             if (nodes.find((node) => node.id === record.get('b').properties.Address) === undefined)
-              nodes.push({ id: record.get('b').properties.Address, name: record.get('b').properties.Name, type: record.get('b').properties.Account_Type, label: record.get('a').properties.Label })
+              nodes.push({ id: record.get('b').properties.Address, name: record.get('b').properties.Name, type: record.get('b').properties.Account_Type, label: record.get('b').properties.Label })
             var link
             if (record.get('t').properties.tx_type === undefined){
               link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address)   
@@ -143,11 +143,19 @@ const Graph = () => {
           const n = queue.length;
           for(let i = 0; i < n; i++) {
             const currNode = queue.shift();
-            const neighbors = getNeighbors(currNode, links);
+            const [neighbors, source_neighbors] = getNeighbors(currNode, links);
             for (const neighbor of neighbors) {
               if(!visited[neighbor]) {
                 const node = nodes.find((node) => node.id === neighbor);
                 node.layer = depth;
+                visited[neighbor] = true;
+                queue.push(neighbor);
+              }
+            }
+            for (const neighbor of source_neighbors) {
+              if(!visited[neighbor]) {
+                const node = nodes.find((node) => node.id === neighbor);
+                node.layer = depth-2;
                 visited[neighbor] = true;
                 queue.push(neighbor);
               }
@@ -159,12 +167,15 @@ const Graph = () => {
       }
       function getNeighbors(node, links) {
         const neighbors = [];
+        const source_neighbors = [];
         links.forEach((link) => {
           if (link.source === node) {
             neighbors.push(link.target);
+          } else if (link.target === node) {
+            source_neighbors.push(link.source);
           }
         })
-        return neighbors
+        return [neighbors, source_neighbors]
       }
     })();
   }, [target]);
