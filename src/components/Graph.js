@@ -36,9 +36,9 @@ const Graph = () => {
           
           readResult.records.forEach(record => {
             if (nodes.find((node) => node.id === record.get('a').properties.Address) === undefined)
-              nodes.push({ id: record.get('a').properties.Address, name: record.get('a').properties.Name, type: record.get('a').properties.Account_Type })
+              nodes.push({ id: record.get('a').properties.Address, name: record.get('a').properties.Name, type: record.get('a').properties.Account_Type, label: record.get('a').properties.Label })
             if (nodes.find((node) => node.id === record.get('b').properties.Address) === undefined)
-              nodes.push({ id: record.get('b').properties.Address, name: record.get('b').properties.Name, type: record.get('b').properties.Account_Type })
+              nodes.push({ id: record.get('b').properties.Address, name: record.get('b').properties.Name, type: record.get('b').properties.Account_Type, label: record.get('a').properties.Label })
             var link
             if (record.get('t').properties.tx_type === undefined){
               link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address)   
@@ -61,7 +61,7 @@ const Graph = () => {
         }
         var last_layer = setLayer(nodes, links, target);
         nodes.forEach((node) => {
-          if (node.type === 'Smart Contract'){
+          if (node.type === 'Smart Contract' && node.label === 'Legit'){
             node.type = 'Contract';
             node.layer = last_layer - 2;
           }
@@ -96,15 +96,17 @@ const Graph = () => {
             nodes.find((node) => node.id === link.source).layer = -1;
         })
         setData({ nodes, links });
-        var adjMatrix = Array.from({ length: nodes.length }, () => Array.from({ length: nodes.length }, () => 0));
-        links.forEach((link) => {
-          adjMatrix[nodes.findIndex((node) => node.id === link.source)][nodes.findIndex((node) => node.id === link.target)] += link.value;
-        })
-        console.log(adjMatrix)
-        const epsilon = 1e-6; // Convergence threshold
-        const { centralityVector, eigenvalue } = calculateWebCentralities(adjMatrix, epsilon);
-        console.log('Web Centralities:', centralityVector);
-        console.log('Dominant Eigenvalue:', eigenvalue);
+        if(nodes.length <= 20) {
+          var adjMatrix = Array.from({ length: nodes.length }, () => Array.from({ length: nodes.length }, () => 0));
+          links.forEach((link) => {
+            adjMatrix[nodes.findIndex((node) => node.id === link.source)][nodes.findIndex((node) => node.id === link.target)] += link.value;
+          })
+          console.log(adjMatrix)
+          const epsilon = 1e-6; // Convergence threshold
+          const { centralityVector, eigenvalue } = calculateWebCentralities(adjMatrix, epsilon);
+          console.log('Web Centralities:', centralityVector);
+          console.log('Dominant Eigenvalue:', eigenvalue);
+        }
       }
 
       function calculateWebCentralities(adjacencyMatrix, epsilon) {
