@@ -46,12 +46,12 @@ const Graph = () => {
               link = links.find((link) => link.source === record.get('a').properties.Address && link.target === record.get('b').properties.Address && link.tx_type == record.get('t').properties.tx_type && link.token_symbol == record.get('t').properties.token_symbol)   
             }
             if ( link === undefined ){
-              links.push({ source: record.get('a').properties.Address, target: record.get('b').properties.Address, value: record.get('t').properties.value, tx_type: record.get('t').properties.tx_type, token_symbol: record.get('t').properties.token_symbol});
+              links.push({ source: record.get('a').properties.Address, target: record.get('b').properties.Address, value: Math.round(record.get('t').properties.value), tx_type: record.get('t').properties.tx_type, token_symbol: record.get('t').properties.token_symbol});
               if ( colors.find((token) => token === record.get('t').properties.token_symbol) === undefined){
                 colors[record.get('t').properties.token_symbol] = Math.floor(Math.random()*16777215).toString(16);
               }
             } else {
-              link.value += record.get('t').properties.value
+              link.value += Math.round(record.get('t').properties.value)
             }
           });
         } catch (error) {
