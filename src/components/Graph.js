@@ -95,8 +95,42 @@ const Graph = () => {
           if (link.target === target)
             nodes.find((node) => node.id === link.source).layer = -1;
         })
-        console.log(nodes);
         setData({ nodes, links });
+        var adjMatrix = Array.from({ length: nodes.length }, () => Array.from({ length: nodes.length }, () => 0));
+        links.forEach((link) => {
+          adjMatrix[nodes.findIndex((node) => node.id === link.source)][nodes.findIndex((node) => node.id === link.target)] += link.value;
+        })
+        console.log(adjMatrix)
+        const epsilon = 1e-6; // Convergence threshold
+        const { centralityVector, eigenvalue } = calculateWebCentralities(adjMatrix, epsilon);
+        console.log('Web Centralities:', centralityVector);
+        console.log('Dominant Eigenvalue:', eigenvalue);
+      }
+
+      function calculateWebCentralities(adjacencyMatrix, epsilon) {
+        const n = adjacencyMatrix.length; // Number of nodes
+        let p = new Array(n).fill(1); // Initial vector
+        var lambda = 0
+        while (true) {
+          const q = transposeMatrix(adjacencyMatrix).map((row) => row.reduce((sum, value, j) => sum + value * p[j], 0)); // Eigenvector estimate
+          const i = q.indexOf(Math.max(...q)); // Maximum value index
+          lambda = q[i] / p[i]; // Eigenvalue estimate
+          q.forEach((value, j) => q[j] = value / q[i]); // Scale vector
+      
+          if (Math.sqrt(q.reduce((sum, value, j) => sum + (value - p[j]) ** 2, 0)) <= epsilon) { // Convergence check
+            p = q;
+            break;
+          }
+      
+          p = q;
+        }
+      
+        const norm = Math.sqrt(p.reduce((sum, value) => sum + value ** 2, 0)); // Euclidean norm
+        p = p.map((value) => value / norm); // Normalize final eigenvector
+        return { centralityVector: p, eigenvalue: lambda };
+      }
+      function transposeMatrix(matrix) {
+        return matrix[0].map((col, i) => matrix.map((row) => row[i]));
       }
       function setLayer(nodes, links, mainNode) {
         const queue = [mainNode];
