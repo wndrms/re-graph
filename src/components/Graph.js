@@ -101,11 +101,11 @@ const Graph = () => {
           links.forEach((link) => {
             adjMatrix[nodes.findIndex((node) => node.id === link.source)][nodes.findIndex((node) => node.id === link.target)] += link.value;
           })
-          console.log(adjMatrix)
           const epsilon = 1e-6; // Convergence threshold
           const { centralityVector, eigenvalue } = calculateWebCentralities(adjMatrix, epsilon);
           console.log('Web Centralities:', centralityVector);
           console.log('Dominant Eigenvalue:', eigenvalue);
+          console.log(nodes[centralityVector.indexOf(Math.max(...centralityVector))])
         }
       }
 
