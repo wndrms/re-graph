@@ -54,7 +54,7 @@ const SearchBar = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} style={{'display': 'flex', 'flexDirection':'column'}}>
+        <form onSubmit={handleSubmit}>
             <input type="text" value={query} onChange={handleInputChange}/>
             <ul>
                 {matchAddr.map((addr) => (
