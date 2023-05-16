@@ -61,9 +61,9 @@ const Graph = () => {
         }
         var last_layer = setLayer(nodes, links, target);
         nodes.forEach((node) => {
-          if (node.type === 'Smart Contract' && node.label === 'Legit'){
+          if (node.type === 'Smart Contract'){
             node.type = 'Contract';
-            node.layer = last_layer - 2;
+            if (node.label === 'Legit') node.layer = last_layer - 2;
           }
           else if (node.type === 'Exchange')
             node.layer = last_layer - 1;
@@ -186,8 +186,8 @@ const Graph = () => {
       const response = await axios.post('/execute', { addr });
       setBalance(response.data.result.toFixed(2));
       setSelected(node);
-      var inc = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
-      var out = {Hacker: 0, Mixer: 0, Exchange: 0, Defi: 0, Contract: 0, Etc: 0};
+      var inc = {Wallet: 0, Contract: 0, Exchange: 0};
+      var out = {Wallet: 0, Contract: 0, Exchange: 0};
       data.links.forEach((link) => {
         if(link.source === addr){
           var t = data.nodes.find((node) => node.id === link.target).type;
